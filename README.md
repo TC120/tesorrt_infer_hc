@@ -1,0 +1,2 @@
+# tesorrt_infer_hc
+用于暂时存放tensorrt相关的pt模型转onnx再转trt的量化推理相关python代码。
