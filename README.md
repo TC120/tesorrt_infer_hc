@@ -1,28 +1,47 @@
-# tesorrt_infer_hc
-用于暂时存放tensorrt相关的pt模型转onnx再转trt的量化推理相关python代码。适用于cuda12.9, tensorrt10.4.1版本
-代码来源于tensorrt官方代码与个人提供者的拼接整合用于自己使用。官方代码更加合规可信但是例子较少。
-https://github.com/NVIDIA/TensorRT.git
+# tensorrt_infer_hc
+本项目用于存放基于 TensorRT 实现的模型量化推理相关 Python 代码，核心流程为「PyTorch 模型 → ONNX 模型 → TensorRT 引擎」，适配 **CUDA 12.9 + TensorRT 10.4.1** 版本，仅用于个人学习与使用。
 
+> 代码说明：核心逻辑基于 NVIDIA TensorRT 官方示例代码改造，结合个人业务需求整合；官方代码合规性更强但示例场景有限，本项目补充了量化、多输入（待实现）等实用场景。
+> 官方仓库：https://github.com/NVIDIA/TensorRT.git
 
+## 环境配置（关键！）
+### 1. 核心依赖安装
+| 依赖库         | 安装命令（适配 CUDA 12.9）| 说明                     |
+|----------------|---------------------------------|--------------------------|
+| TensorRT (Python) | `pip install tensorrt==10.4.1`  | 核心推理/转换库          |
+| cuda-python    | `pip install cuda-python==12.9` | 严格匹配 CUDA 版本，否则导入 `cudart` 失败 |
+| pycuda         | `pip install pycuda`            | CUDA 内存/流管理依赖     |
+| PyTorch        | 适配 CUDA 12.9 的稳定版本       | 模型导出 ONNX 需用       |
+| OpenCV-Python  | `pip install opencv-python`     | 图片预处理/后处理        |
 
+### 2. 关键注意事项
+- **trtexec 工具可用性**：
+  - 仅安装 Python 版 TensorRT 时，无 `trtexec` 工具，需完全通过 Python 代码实现 ONNX→TRT 转换；
+  - 若通过 deb 包安装 C++ 版 TensorRT，可使用 `trtexec`，但需保证 C++ 版本与 Python 版本完全一致（否则生成的 TRT 引擎文件无法跨版本使用）。
+- CUDA 版本匹配：`cuda-python` 版本必须与系统 CUDA 驱动版本（`nvcc -V` 查看）严格一致，否则会出现 `ImportError: cannot import name 'cudart'` 等错误。
 
-前期环境配置要注意，如果只安装了python版本的tensorrt，是没有trtexec工具的，所有的转换需要依靠python代码来实现。注意cuda-python(from cuda import cudart)的安装需要指定为自己的cuda版本，严格匹配。否则无法使用, 
-pip install cuda-python==12.9。
-如果还通过deb的方式安装了C++版本的trt，是可以使用trtexec的，但是注意其与python版本是否一致，否则两者即使在同一硬件中，生成的文件也无法互相使用。
+## 目录结构与功能说明
+### 1. onnx_model_generator
+- 核心脚本：`torch_model_to_onnx.py`
+- 功能：
+  - 自动选择/下载 PyTorch 预训练模型（.pt 格式）；
+  - 验证原始模型推理效果；
+  - 将 .pt 模型导出为 ONNX 格式（TensorRT 兼容）。
 
+### 2. onnx_to_trt
+- 核心脚本：`onnx_to_trt.py`
+  - `one_input_onnx_to_trt()`：单输入 ONNX 模型转 TensorRT 引擎的完整示例（支持 FP32/FP16/INT8 量化）；
+  - `mult_input_onnx_to_trt()`：多输入模型转换函数（待实现）；
+- 辅助脚本：`calibrator_int8.py`
+  - 为 INT8 量化提供校准数据集，解决低精度量化精度损失问题。
 
-##  onnx_model_generator
-    在torch_model_to_onnx.py中，使用torch进行模型选择和下载，得到.pt格式的模型文件，并且对模型效果进行简单验证。
-    
+### 3. infer_time
+- 核心脚本：`trt_model_inference.py`
+  - 功能：加载已生成的 TensorRT 引擎文件，实现模型推理（仅核心推理流程，暂未集成完整前后处理）；
+  - 关键函数：`trt_inference(engine_path, image_path)` —— 输入引擎路径+图片路径，返回推理结果。
 
-##  onnx_to_trt
-    onnx_to_trt.py中，提供了两种转化方案，one_input_onnx_to_trt()作为单输入的例子。mult_input_onnx_to_trt()（未实现）
-    可以使用calibrator_int8.py来在int8量化时提供量化数据。
-
-
-##  infer_time
-    在trt_model_inferrence.py中，使用tensorrt和cuda-python，pycuda等库来加载trt模型并推理。
-    trt_inference()中仅仅实现了推理的过程，没有使用前后处理等过程。
-
-
-
+## 快速使用流程
+1. **导出 ONNX 模型**：运行 `onnx_model_generator/torch_model_to_onnx.py`，生成适配 TensorRT 的 ONNX 文件；
+2. **转换为 TRT 引擎**：
+   - 单输入模型：调用 `onnx_to_trt/onnx_to_trt.py` 中的 `one_input_onnx_to_trt()`，支持 INT8 量化（需配置 `calibrator_int8.py` 校准数据）；
+3. **执行推理**：运行 `infer_time/trt_model_inference.py`，传入 TRT 引擎路径和测试图片路径，完成推理。
