@@ -39,7 +39,7 @@ def ckeck_opencv_cuda_support():
     print("\nOpenCV 编译配置：")
     print(cv2.getBuildInformation())
 
-@profile
+# @profile
 def read_capture_in_gpu():
     cap = cv2.VideoCapture(0)
     cuda_stream = cv2.cuda_Stream()

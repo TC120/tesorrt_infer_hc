@@ -1,0 +1,6 @@
+此文件夹代码用于onnx模型到trt结构的转换。
+build_engine.py为tensorrt官方10.4.1版本的转换代码，其中能使用混合精度编译(但操作有局限性)，其对应的int8量化数据校准的前处理函数在image_batcher.py中
+
+normel_model_to_onnx.py为自己写的onnx到trt的转换代码，没有混合精度编译，其对应的int8量化数据校准的函数在calibrator_int8.py中
+
+经过测试，两者的处理结果相同。

@@ -109,10 +109,6 @@ python -c "import cv2; print('CUDA 设备数：', cv2.cuda.getCudaEnabledDeviceC
 
 
 
-read_capture_in_cpu/gpu()的测试结果, 但是从结果来看耗时没有明显区别
-![profile耗时计算](./cpu_resize.png "profile耗时计算")
-![profile耗时计算](./gpu_resize.png "profile耗时计算")
-
 
 
 

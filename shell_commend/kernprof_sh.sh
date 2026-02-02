@@ -1,0 +1,1 @@
+kernprof -lv -o ./video_cuda/profile/post_processor_compare.lprof ./video_cuda/post_processor_compare.py 

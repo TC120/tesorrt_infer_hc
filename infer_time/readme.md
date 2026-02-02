@@ -1,0 +1,6 @@
+反实例化ultrulytics生成的engine文件时，由于其官方会在开头写入一些他自己使用的数据，导致反实例化时tensorrt无法解析，可以按照https://blog.csdn.net/ogebgvictor/article/details/145858668的方案解决
+
+
+infer_compare.py中展示了如何使用trt库来读取ultrulytics的engine模型，注意两者的编译trt环境和cuda环境要一致。使用自己写的代码进行模型推理。
+
+trt_model_inference.py展示了使用trt官方代码来读取ultrulytics的engine模型并推理。

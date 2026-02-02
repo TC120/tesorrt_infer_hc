@@ -24,9 +24,10 @@
 ### 1. onnx_model_generator
 - 核心脚本：`torch_model_to_onnx.py`
 - 功能：
-  - 自动选择/下载 PyTorch 预训练模型（.pt 格式）；
-  - 验证原始模型推理效果；
   - 将 .pt 模型导出为 ONNX 格式（TensorRT 兼容）。
+- 核心脚本：`onnx_model_change.py`
+- 功能：
+  - 对onnx模型的层进行删除与添加
 
 ### 2. onnx_to_trt
 - 核心脚本：`onnx_to_trt.py`
@@ -39,6 +40,11 @@
 - 核心脚本：`trt_model_inference.py`
   - 功能：加载已生成的 TensorRT 引擎文件，实现模型推理（仅核心推理流程，暂未集成完整前后处理）；
   - 关键函数：`trt_inference(engine_path, image_path)` —— 输入引擎路径+图片路径，返回推理结果。
+
+### 4. video_cuda
+- 脚本： `video_cuda_read.py`
+  - 功能：对比是否使用cuda读取视频或者视频流的时间。
+
 
 ## 快速使用流程
 1. **导出 ONNX 模型**：运行 `onnx_model_generator/torch_model_to_onnx.py`，生成适配 TensorRT 的 ONNX 文件；

@@ -51,6 +51,7 @@ class MyCalibrator(trt.IInt8EntropyCalibrator2):
 
         for i in range(self.shape[0]):
             image_data = cv2.imread(imageList[i]).astype(np.float32)
+            image_data = cv2.resize(image_data, (640, 640), interpolation=cv2.INTER_CUBIC)
             image_data = image_data.transpose(2, 1, 0)
             if np.max(image_data) > 256:  # 16-bit image
                 max_range = 65535
