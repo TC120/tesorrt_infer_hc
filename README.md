@@ -21,7 +21,14 @@
 - CUDA 版本匹配：`cuda-python` 版本必须与系统 CUDA 驱动版本（`nvcc -V` 查看）严格一致，否则会出现 `ImportError: cannot import name 'cudart'` 等错误。
 
 ## 目录结构与功能说明
-### 1. onnx_model_generator
+### gpu_cuda_test
+- 用于测试模型的前后处理以及模型推理的GPU上耗时估计。
+
+### gpu_cuda_test
+- 用于测试模型的前后处理以及模型推理的GPU上耗时估计。
+
+
+### onnx_model_generator
 - 核心脚本：`torch_model_to_onnx.py`
 - 功能：
   - 将 .pt 模型导出为 ONNX 格式（TensorRT 兼容）。
@@ -29,25 +36,17 @@
 - 功能：
   - 对onnx模型的层进行删除与添加
 
-### 2. onnx_to_trt
+### onnx_to_trt
 - 核心脚本：`onnx_to_trt.py`
   - `one_input_onnx_to_trt()`：单输入 ONNX 模型转 TensorRT 引擎的完整示例（支持 FP32/FP16/INT8 量化）；
   - `mult_input_onnx_to_trt()`：多输入模型转换函数（待实现）；
 - 辅助脚本：`calibrator_int8.py`
   - 为 INT8 量化提供校准数据集，解决低精度量化精度损失问题。
 
-### 3. infer_time
+### infer_time
 - 核心脚本：`trt_model_inference.py`
   - 功能：加载已生成的 TensorRT 引擎文件，实现模型推理（仅核心推理流程，暂未集成完整前后处理）；
   - 关键函数：`trt_inference(engine_path, image_path)` —— 输入引擎路径+图片路径，返回推理结果。
 
-### 4. video_cuda
-- 脚本： `video_cuda_read.py`
-  - 功能：对比是否使用cuda读取视频或者视频流的时间。
-
-
-## 快速使用流程
-1. **导出 ONNX 模型**：运行 `onnx_model_generator/torch_model_to_onnx.py`，生成适配 TensorRT 的 ONNX 文件；
-2. **转换为 TRT 引擎**：
-   - 单输入模型：调用 `onnx_to_trt/onnx_to_trt.py` 中的 `one_input_onnx_to_trt()`，支持 INT8 量化（需配置 `calibrator_int8.py` 校准数据）；
-3. **执行推理**：运行 `infer_time/trt_model_inference.py`，传入 TRT 引擎路径和测试图片路径，完成推理。
+### shell_commend
+- 用于ubuntu中nvida的trt软件与nsys分析软件的shell调用方法。
